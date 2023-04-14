@@ -79,13 +79,20 @@ def test_forbidden_access_teacher(client, h_teacher_1):
         '/student/assignments/submit',
         headers=h_teacher_1,
         json={
-            "id": 1,
-            "code": "print('Hello, World!')"
+            'id': 1,
+            'teacher_id': 1
         }
     )
+    error_response = response.json
     assert response.status_code == 403
+    assert error_response['error'] == 'FyleError'
+    assert error_response["message"] == 'requester should be a student'
+
 
 def test_unauthorized_access_student(client):
     # Try to access teacher-specific resources without authentication
     response = client.get('/teacher/assignments')
+    error_response = response.json
     assert response.status_code == 401
+    assert error_response['error'] == 'FyleError'
+    assert error_response["message"] == 'principal not found'

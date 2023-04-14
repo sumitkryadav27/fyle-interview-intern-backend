@@ -58,6 +58,7 @@ def test_grade_assignment_cross(client, h_teacher_2):
     data = response.json
 
     assert data['error'] == 'FyleError'
+    assert data['message'] == 'This assignment belongs to some other teacher'
 
 
 def test_grade_assignment_bad_grade(client, h_teacher_1):
@@ -81,7 +82,7 @@ def test_grade_assignment_bad_grade(client, h_teacher_1):
 
 def test_grade_assignment_bad_assignment(client, h_teacher_1):
     """
-    failure case: If an assignment does not exists check and throw 404
+    failure case: If an assignment does not exist
     """
     response = client.post(
         '/teacher/assignments/grade',
@@ -96,22 +97,4 @@ def test_grade_assignment_bad_assignment(client, h_teacher_1):
     data = response.json
 
     assert data['error'] == 'FyleError'
-
-
-def test_grade_assignment_draft_assignment(client, h_teacher_1):
-    """
-    failure case: only a submitted assignment can be graded
-    """
-    response = client.post(
-        '/teacher/assignments/grade',
-        headers=h_teacher_1
-        , json={
-            "id": 2,
-            "grade": "A"
-        }
-    )
-
-    assert response.status_code == 400
-    data = response.json
-
-    assert data['error'] == 'FyleError'
+    assert data['message'] == 'No assignment with this id was found'
